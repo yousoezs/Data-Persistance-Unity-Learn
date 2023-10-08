@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScore;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -38,6 +41,11 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        PlayerManager.Instance.LoadData();
+    }
+
     private void Update()
     {
         if (!m_Started)
@@ -51,6 +59,10 @@ public class MainManager : MonoBehaviour
 
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+                if (PlayerManager.Instance != null)
+                {
+                    BestScore.text = $"Best Score : {PlayerManager.Instance.Name} : {PlayerManager.Instance.Score}";
+                }
             }
         }
         else if (m_GameOver)
@@ -71,6 +83,9 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
+        BestScore.text = $"Best Score : {PlayerManager.Instance.Name} : {m_Points}";
+        PlayerManager.Instance.Score = m_Points;
+        PlayerManager.Instance.SaveData();
         GameOverText.SetActive(true);
     }
 }
